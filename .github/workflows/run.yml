@@ -1,5 +1,3 @@
-.github/workflows/run.yml
-
 name: Daily Naukri Resume Upload
 
 on:
