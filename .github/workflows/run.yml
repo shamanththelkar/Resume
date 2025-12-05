@@ -1,8 +1,10 @@
+.github/workflows/run.yml
+
 name: Daily Naukri Resume Upload
 
 on:
   schedule:
-    - cron: "30 2 * * *"   # Runs at 8:00 AM IST (02:30 UTC)
+    - cron: "30 2 * * *"  # Runs at 8:00 AM IST (02:30 UTC)
   workflow_dispatch:
 
 jobs:
