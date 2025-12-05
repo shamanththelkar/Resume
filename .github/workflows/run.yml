@@ -1,0 +1,29 @@
+name: Daily Naukri Resume Upload
+
+on:
+  schedule:
+    - cron: "30 2 * * *"   # Runs at 8:00 AM IST (02:30 UTC)
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install chromium
+
+      - name: Run script
+        env:
+          NAUKRI_EMAIL: ${{ secrets.NAUKRI_EMAIL }}
+          NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
+          RESUME1: ${{ secrets.RESUME1 }}
+          RESUME2: ${{ secrets.RESUME2 }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python naukri_update.py
