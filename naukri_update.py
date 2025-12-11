@@ -33,8 +33,10 @@ def upload_resume():
             page.get_by_role("button", name="Login", exact=True).click()
 
         # Go to profile
-        page.goto("https://www.naukri.com/mnjuser/profile")
-        page.wait_for_load_state("networkidle")
+       # Go to login page (Corrected URL)
+page.goto("https://www.naukri.com/nlogin/login?URL=https://www.naukri.com/mnjuser/profile")
+page.wait_for_load_state("networkidle")
+
 
         # Upload resume
         print(f"Uploading resume: {resume_path}")
