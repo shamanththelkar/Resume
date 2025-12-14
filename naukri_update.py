@@ -1,14 +1,14 @@
 from playwright.sync_api import sync_playwright
-import os
 from datetime import datetime, UTC
+import os
 
 # Secrets
 NAUKRI_EMAIL = os.getenv("NAUKRI_EMAIL")
 NAUKRI_PASSWORD = os.getenv("NAUKRI_PASSWORD")
+
 RESUME1 = os.getenv("RESUME1")
 RESUME2 = os.getenv("RESUME2")
 
-# Alternate resume daily
 today = datetime.now(UTC).day
 resume_path = RESUME1 if today % 2 == 0 else RESUME2
 
@@ -19,38 +19,33 @@ def upload_resume():
         context = browser.new_context()
         page = context.new_page()
 
-        # Login page (IMPORTANT URL)
+        # ✅ Login URL with redirect
         page.goto(
-            "https://www.naukri.com/nlogin/login?URL=https://www.naukri.com/mnjuser/profile"
+            "https://www.naukri.com/nlogin/login?URL=https://www.naukri.com/mnjuser/profile",
+            timeout=60000
         )
-        page.wait_for_load_state("networkidle")
 
-        # Login
-        page.get_by_role(
-            "textbox", name="Enter Email ID / Username"
-        ).fill(NAUKRI_EMAIL)
-        page.get_by_role(
-            "textbox", name="Enter Password"
-        ).fill(NAUKRI_PASSWORD)
+        # ✅ Wait for email field (CSS selector, not role)
+        page.wait_for_selector("input[type='text']", timeout=60000)
 
-        with page.expect_navigation():
-            page.get_by_role(
-                "button", name="Login", exact=True
-            ).click()
+        # Fill credentials
+        page.fill("input[type='text']", NAUKRI_EMAIL)
+        page.fill("input[type='password']", NAUKRI_PASSWORD)
 
-        # Profile page
-        page.goto("https://www.naukri.com/mnjuser/profile")
+        # Click login
+        page.click("button[type='submit']")
+
+        # ✅ Wait until profile page loads
+        page.wait_for_url("**/mnjuser/profile", timeout=60000)
         page.wait_for_load_state("networkidle")
 
         # Upload resume
-        page.get_by_role(
-            "button", name="Update resume"
-        ).set_input_files(resume_path)
-
         print(f"Uploading resume: {resume_path}")
-        page.wait_for_load_state("networkidle")
+        page.set_input_files("input[type='file']", resume_path)
 
+        page.wait_for_load_state("networkidle")
         print("Resume uploaded successfully")
+
         browser.close()
 
 
